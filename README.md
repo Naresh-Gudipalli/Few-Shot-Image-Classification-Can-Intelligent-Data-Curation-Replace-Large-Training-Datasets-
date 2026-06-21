@@ -2,13 +2,11 @@
 
 ## Overview
 
-This dissertation investigates whether intelligently curated small subsets of training data can approach the performance of models trained on full datasets. A fixed SimpleCNN architecture is trained across five phases — from full-data baselines down to subsets as small as 0.2% of the original training set — with the only variable being *how* the training examples are selected.
-
-The core question: **does smart data selection beat random sampling, and by how much?**
+This dissertation investigates whether intelligently curated small subsets of training data can approach the performance of models trained on full datasets. A fixed SimpleCNN architecture is trained across five phases from full-data baselines down to subsets as small as 0.2% of the original training set with the only variable being *how* the training examples are selected.
 
 ---
 
-## Architecture — SimpleCNN (Fixed Across All Phases)
+## Architecture - SimpleCNN (Fixed Across All Phases)
 
 The same model is used in every phase. Nothing changes except the training data.
 
@@ -58,12 +56,12 @@ Linear(512→256) → ReLU → Dropout(0.5) → Linear(256→10)
 ## Datasets & Preprocessing
 
 ### MNIST
-- 60,000 training / 10,000 test images — greyscale digits 0–9
-- Normalisation: mean=0.1307, std=0.3081
-- No augmentation
+- 60,000 training and 10,000 test images (greyscale handwritten digits 0–9)
+- Normalised using a mean of 0.1307 and standard deviation of 0.3081.
+- No augmentation is applied
 
 ### CIFAR-10
-- 50,000 training / 10,000 test images — 10 natural image categories
+- 50,000 training and 10,000 test images across 10 natural image categories
 - Normalisation: mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010)
 - Training augmentation: RandomHorizontalFlip + RandomCrop(32, padding=4)
 
@@ -75,7 +73,7 @@ Linear(512→256) → ReLU → Dropout(0.5) → Linear(256→10)
 |---|---|---|---|
 | 1 | Full-data baseline | 100% | ✅ Complete |
 | 2 | Random subset sampling | 0.2%, 0.5%, 1%, 2%, 5% | 🔄 In Progress |
-| 3 | Stratified subset sampling | 0.2%, 0.5%, 1%, 2%, 5% | ⏳ Pending |
+| 3 | Stratified subset sampling | 0.2%, 0.5%, 1%, 2%, 5% | ⏳ Next Up |
 | 4 | Intelligent curation strategies | 0.2%, 0.5%, 1%, 2%, 5% | ⏳ Pending |
 | 5 | Hard-example mining | 0.2%, 0.5%, 1%, 2%, 5% | ⏳ Pending |
 
@@ -90,7 +88,7 @@ Linear(512→256) → ReLU → Dropout(0.5) → Linear(256→10)
 | MNIST | **98.98% ± 0.43** | **0.9898 ± 0.0042** |
 | CIFAR-10 | **80.93% ± 0.33** | **0.8084 ± 0.0028** |
 
-These are the **ceiling lines** — the best the fixed architecture can do with all available data.
+These are the **ceiling lines**- the best the fixed architecture can do with all available data.
 
 #### CIFAR-10 Per-Class F1 (Phase 1)
 
@@ -102,15 +100,15 @@ These are the **ceiling lines** — the best the fixed architecture can do with 
 | cat | 0.6465 ± 0.0177 | truck | 0.8786 ± 0.0100 |
 | deer | 0.7908 ± 0.0051 | dog | 0.7386 ± 0.0138 |
 
-Notable: cat (0.6465) and dog (0.7386) are the weakest classes — visually similar and the hardest to separate. Automobile (0.9055) is the strongest.
+Notable: cat (0.6465) and dog (0.7386) are the weakest classes visually similar and the hardest to separate. Automobile (0.9055) is the strongest.
 
-### Phase 2 — Random Subset *(results to be added)*
+### Phase 2 - Random Subset *(results to be added)*
 
-### Phase 3 — Stratified Subset *(results to be added)*
+### Phase 3 - Stratified Subset *(results to be added)*
 
-### Phase 4 — Intelligent Curation *(results to be added)*
+### Phase 4 - Intelligent Curation *(results to be added)*
 
-### Phase 5 — Hard-Example Mining *(results to be added)*
+### Phase 5 - Hard-Example Mining *(results to be added)*
 
 ---
 
@@ -161,15 +159,5 @@ Each phase notebook is self-contained — it includes all imports, the full Simp
 
 - Phase 1 establishes that SimpleCNN reaches **98.98%** on MNIST and **80.93%** on CIFAR-10 with full data
 - Cat/dog visual similarity is the primary weakness of the baseline model (gap of ~0.26 F1 vs best class)
-- *(Phases 2–5 findings to be added)*
-
----
-
-## Notes
-
-- All experiments use 5 fixed seeds `[42, 123, 456, 789, 1011]` and report mean ± std
-- Model checkpoints saved per seed as `baseline_<dataset>_seed<seed>_model.pth` (not tracked in git)
-- Phase 5 reuses Phase 1 seed-42 checkpoints for hard-example scoring
-- Seed 123 produced a mild MNIST outlier (98.14%) — retained in reporting as mean ± std accounts for it
 
 ---
