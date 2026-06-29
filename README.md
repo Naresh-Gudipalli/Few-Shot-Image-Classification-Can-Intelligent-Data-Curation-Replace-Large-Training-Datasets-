@@ -6,7 +6,7 @@
  
 Training deep neural networks on large labelled datasets is expensive in time, money and compute. But not all training examples are equally useful. This project investigates whether intelligently choosing a small subset of training data can approach the performance of training on the full dataset.
  
-The experiment is fully controlled: one architecture (SimpleCNN), one optimiser, five fixed random seeds, two datasets (MNIST and CIFAR-10) and five subset sizes from 0.2% to 5%. The only variable across phases is the selection strategy:Random Sampling, class-balanced, diversity-based or importance-based. Because everything else is locked, Any difference in accuracy is attributable to the selection method alone.
+The experiment is fully controlled: one architecture (SimpleCNN), one optimiser, five fixed random seeds, two datasets (MNIST and CIFAR-10) and five subset sizes from 0.2% to 5%. The only variable across phases is the selection strategy:- Random, class-balanced, diversity-based or importance-based. Because everything else is locked, Any difference in accuracy is attributable to the selection method alone.
  
 ---
  
