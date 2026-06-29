@@ -1,163 +1,136 @@
 # Few-Shot Image Classification: Can Intelligent Data Curation Replace Large Training Datasets?
 
+---
+ 
 ## Overview
-
-This dissertation investigates whether intelligently curated small subsets of training data can approach the performance of models trained on full datasets. A fixed SimpleCNN architecture is trained across five phases from full-data baselines down to subsets as small as 0.2% of the original training set with the only variable being *how* the training examples are selected.
-
+ 
+Training deep neural networks on large labelled datasets is expensive in time, money and compute. But not all training examples are equally useful. This project investigates whether intelligently choosing a small subset of training data can approach the performance of training on the full dataset.
+ 
+The experiment is fully controlled: one architecture (SimpleCNN), one optimiser, five fixed random seeds, two datasets (MNIST and CIFAR-10) and five subset sizes from 0.2% to 5%. The only variable across phases is the selection strategy:Random Sampling, class-balanced, diversity-based or importance-based. Because everything else is locked, Any difference in accuracy is attributable to the selection method alone.
+ 
 ---
-
-## Architecture - SimpleCNN (Fixed Across All Phases)
-
-The same model is used in every phase. Nothing changes except the training data.
-
-```
-Input (1×28×28 MNIST / 3×32×32 CIFAR-10)
-        │
-        ▼
-Conv Block 1: Conv2d(in_ch→32, 3×3, pad=1) → BatchNorm2d → ReLU → MaxPool2d(2×2)
-        │
-        ▼
-Conv Block 2: Conv2d(32→64, 3×3, pad=1)    → BatchNorm2d → ReLU → MaxPool2d(2×2)
-        │
-        ▼
-Conv Block 3: Conv2d(64→128, 3×3, pad=1)   → BatchNorm2d → ReLU → MaxPool2d(2×2)
-        │
-        ▼
-AdaptiveAvgPool2d(2×2)  →  Flatten  →  512 features
-        │
-        ▼
-Linear(512→256) → ReLU → Dropout(0.5) → Linear(256→10)
-        │
-        ▼
-   Logits (10 classes)
-```
-
-**Why fixed?** Any accuracy difference between phases must come from the data selection strategy, not the model. Keeping the architecture identical is what makes the comparison scientifically valid.
-
----
-
-## Fixed Hyperparameters
-
-| Parameter | Value |
-|---|---|
-| Optimiser | Adam |
-| Learning rate | 1e-3 |
-| Weight decay | 1e-4 |
-| Scheduler | ReduceLROnPlateau (factor=0.5, patience=3) |
-| Dropout | 0.5 |
-| Batch size | 128 |
-| Seeds | 42, 123, 456, 789, 1011 |
-| MNIST epochs | 20 |
-| CIFAR-10 epochs | 30 |
-| Platform | Kaggle GPU T4 |
-
----
-
-## Datasets & Preprocessing
-
-### MNIST
-- 60,000 training and 10,000 test images (greyscale handwritten digits 0–9)
-- Normalised using a mean of 0.1307 and standard deviation of 0.3081.
-- No augmentation is applied
-
-### CIFAR-10
-- 50,000 training and 10,000 test images across 10 natural image categories
-- Normalisation: mean=(0.4914, 0.4822, 0.4465), std=(0.2023, 0.1994, 0.2010)
-- Training augmentation: RandomHorizontalFlip + RandomCrop(32, padding=4)
-
----
-
-## Experimental Phases
-
-| Phase | Description | Subset Size | Status |
-|---|---|---|---|
-| 1 | Full-data baseline | 100% | ✅ Complete |
-| 2 | Random subset sampling | 0.2%, 0.5%, 1%, 2%, 5% | 🔄 In Progress |
-| 3 | Stratified subset sampling | 0.2%, 0.5%, 1%, 2%, 5% | ⏳ Next Up |
-| 4 | Intelligent curation strategies | 0.2%, 0.5%, 1%, 2%, 5% | ⏳ Pending |
-| 5 | Hard-example mining | 0.2%, 0.5%, 1%, 2%, 5% | ⏳ Pending |
-
----
-
-## Results
-
-### Phase 1 — Full Baseline (5 seeds, GPU T4)
-
-| Dataset | Top-1 Accuracy | Macro F1 |
-|---|---|---|
-| MNIST | **98.98% ± 0.43** | **0.9898 ± 0.0042** |
-| CIFAR-10 | **80.93% ± 0.33** | **0.8084 ± 0.0028** |
-
-These are the **ceiling lines**- the best the fixed architecture can do with all available data.
-
-#### CIFAR-10 Per-Class F1 (Phase 1)
-
-| Class | F1 ± Std | Class | F1 ± Std |
-|---|---|---|---|
-| airplane | 0.8102 ± 0.0169 | frog | 0.8508 ± 0.0081 |
-| automobile | 0.9055 ± 0.0100 | horse | 0.8468 ± 0.0114 |
-| bird | 0.7262 ± 0.0060 | ship | 0.8903 ± 0.0054 |
-| cat | 0.6465 ± 0.0177 | truck | 0.8786 ± 0.0100 |
-| deer | 0.7908 ± 0.0051 | dog | 0.7386 ± 0.0138 |
-
-Notable: cat (0.6465) and dog (0.7386) are the weakest classes visually similar and the hardest to separate. Automobile (0.9055) is the strongest.
-
-### Phase 2 - Random Subset *(results to be added)*
-
-### Phase 3 - Stratified Subset *(results to be added)*
-
-### Phase 4 - Intelligent Curation *(results to be added)*
-
-### Phase 5 - Hard-Example Mining *(results to be added)*
-
----
-
+ 
 ## Repository Structure
-
+ 
 ```
-dissertation-few-shot-classification/
-│
-├── README.md
-│
 ├── phase1-baseline/
-│   └── phase1-baseline-final.ipynb
-│
-├── phase2-random-subset/
-│   └── phase2-random-subset.ipynb
-│
-├── phase3-stratified-subset/
-│   └── phase3-stratified-subset.ipynb
-│
-├── phase4-curation-strategies/
-│   └── phase4-curation.ipynb
-│
-├── phase5-hard-example-mining/
-│   └── phase5-hard-example-mining.ipynb
-│
-├── results/
-│   └── baseline_results.md
-│
-└── .gitignore
+│   └── phase1-baseline-final.ipynb        # Full-dataset ceiling (COMPLETE ✅)
+├── phase2-random-subsampling/
+│   └── phase2_random_subsampling.py       # Random subset floor (COMPLETE ✅)
+├── .gitignore
+└── README.md
 ```
-
+ 
+> Phases 3–5 will be added as each phase completes.
+ 
 ---
-
-## How to Run
-
-All notebooks are designed to run on **Kaggle with GPU T4 accelerator**.
-
-1. Upload the notebook to Kaggle
-2. Set accelerator: **Settings → Accelerator → GPU T4 x2**
-3. Run All cells top to bottom
-4. Save Version once complete
-
-Each phase notebook is self-contained — it includes all imports, the full SimpleCNN definition, and all helper functions. No external dependencies beyond standard PyTorch + torchvision + sklearn.
-
+ 
+## Experimental Setup (Fixed Across All Phases)
+ 
+| Component | Value |
+|-----------|-------|
+| Architecture | SimpleCNN 3 conv blocks (32→64→128), AdaptiveAvgPool2d(2,2), FC 512→256→10 |
+| Optimiser | Adam lr=1e-3, weight_decay=1e-4 |
+| Scheduler | ReduceLROnPlateau (min, factor=0.5, patience=3) steps on training loss |
+| Seeds | [42, 123, 456, 789, 1011] 5 seeds for mean ± std |
+| Subset sizes | 0.2%, 0.5%, 1%, 2%, 5% of training set |
+| Batch size | 128 |
+| Epochs | MNIST: 20 · CIFAR-10: 30 |
+| MNIST | Normalise only  mean 0.1307, std 0.3081 |
+| CIFAR-10 | RandomHorizontalFlip + RandomCrop(32, padding=4) + normalise (train only) |
+| Platform | Kaggle GPU T4 x2 |
+ 
 ---
-
-## Key Findings *(updated as phases complete)*
-
-- Phase 1 establishes that SimpleCNN reaches **98.98%** on MNIST and **80.93%** on CIFAR-10 with full data
-- Cat/dog visual similarity is the primary weakness of the baseline model (gap of ~0.26 F1 vs best class)
-
+ 
+## Phase Status & Results
+ 
+### Phase 1: Full Dataset Ceiling ✅ COMPLETE
+ 
+Trains SimpleCNN on the complete training set to establish the performance ceiling.
+Every later phase is reported as a distance from these numbers.
+ 
+| Dataset | Top-1 Accuracy | Macro-F1 |
+|---------|---------------|----------|
+| MNIST | **98.98% ± 0.43** | 0.9898 ± 0.0042 |
+| CIFAR-10 | **80.93% ± 0.33** | 0.8084 ± 0.0028 |
+ 
+CIFAR-10 weakest classes: cat = 0.6465 · bird = 0.7262 · dog = 0.7386
+CIFAR-10 strongest class: automobile = 0.9055
+ 
+---
+ 
+### Phase 2: Random Subsampling Floor ✅ COMPLETE
+ 
+Trains SimpleCNN on randomly sampled tiny subsets. This is the naive baseline the number every intelligent curation strategy in Phases 3–5 must achieve.
+ 
+**MNIST** (ceiling: 98.98%)
+ 
+| Subset | Images | Top-1 Mean | ± Std | Gap to ceiling |
+|--------|--------|-----------|-------|----------------|
+| 0.2% | 120 | 24.31% | 10.76% | 74.7 pp |
+| 0.5% | 300 | 82.03% | 10.29% | 16.9 pp |
+| 1% | 600 | 94.54% | 0.82% | 4.4 pp |
+| 2% | 1200 | 95.68% | 1.22% | 3.3 pp |
+| 5% | 3000 | **96.87%** | 0.46% | 2.1 pp |
+ 
+**CIFAR-10** (ceiling: 80.93%)
+ 
+| Subset | Images | Top-1 Mean | ± Std | Gap to ceiling |
+|--------|--------|-----------|-------|----------------|
+| 0.2% | 100 | 23.29% | 2.98% | 57.6 pp |
+| 0.5% | 250 | 33.12% | 3.06% | 47.8 pp |
+| 1% | 500 | 40.08% | 0.25% | 40.9 pp |
+| 2% | 1000 | 48.00% | 2.25% | 32.9 pp |
+| 5% | 2500 | **58.05%** | 1.33% | 22.9 pp |
+ 
+> CIFAR-10 has a **22.9 pp gap** at 5% between random selection and the full-dataset ceiling. That gap is what Phases 3–5 are designed to close.
+ 
+---
+ 
+### Phase 3: Class-Balanced Selection 🔲 PENDING
+ 
+Fixes random sampling's key weakness accidental class imbalance at tiny sizes
+by drawing an equal number of examples from every class. Isolates how much of
+the random baseline's weakness is purely due to imbalance vs which examples are chosen.
+ 
+---
+ 
+### Phase 4: K-Means / Coverage Selection 🔲 PENDING
+ 
+Selects examples that maximise diversity across the feature space, reducing
+redundancy within each subset. Tests the coreset hypothesis: a well-spread
+subset outperforms a random or merely balanced one.
+ 
+---
+ 
+### Phase 5: Hard-Example Mining 🔲 PENDING
+ 
+Scores examples by difficulty and selects the most informative ones.
+Reuses Phase 1 seed-42 checkpoints for cheap scoring.
+Includes a guard against the over-pruning failure mode identified by Paul et al. (2021).
+ 
+---
+ 
+### Phase 6: Analysis & Synthesis 🔲 PENDING
+ 
+Cross-phase comparison, per-class analysis, cost–benefit discussion
+and a direct evidenced answer to the dissertation's title question.
+ 
+---
+ 
+## Key Papers
+ 
+| Paper | Summary |
+|-------|---------|
+| [Toneva et al. (2019)](https://arxiv.org/abs/1812.05159) | Forgetting events — not all training examples are equal |
+| [Coleman et al. (2020)](https://arxiv.org/abs/1906.11829) | Selection via Proxy — cheap proxy models can rank example importance |
+| [Paul et al. (2021)](https://arxiv.org/abs/2107.07075) | EL2N scoring — importance-based pruning with an over-pruning warning |
+ 
+---
+ 
+## Declared Limitations
+ 
+1. **No validation split**: scheduler watches training loss; consistent across all phases so cross-phase comparisons remain fair, but absolute numbers are affected.
+2. **CIFAR augmentation confound**: augmentation inflates effective training data at tiny sizes; kept identical across all phases so comparisons are fair.
+3. **AdaptiveAvgPool2d(2,2)**: retains 512 spatial features rather than collapsing to 128; deliberate choice to preserve coarse spatial layout.
 ---
