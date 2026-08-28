@@ -50,7 +50,7 @@ Later phases consume earlier phases outputs, so order matters.
 
 | Step | Phase | Depends on | Produces |
 |---|---|---|---|
-| 1 | `phase1-baseline` | — | Five per-seed checkpoints (one per seed, per dataset) + the ceiling results |
+| 1 | `phase1-baseline` | Raw datasets, random seeds, training hyperparameters | Five per-seed checkpoints (one per seed, per dataset) + the ceiling results |
 | 2 | `phase2-random-subsampling` | Nothing from Phase 1 | The random-selection floor |
 | 3 | `phase3-class-balanced` | Nothing from Phase 1 | Class-balanced results, and the per-class quota used by Phases 4–5 |
 | 4 | `phase4-k-means` | Phase 1 checkpoints (for embeddings) | K-means coreset results, selection indices |
@@ -136,19 +136,19 @@ Identical in every phase. Changing any of these invalidates cross-phase comparis
 
 | | |
 |---|---|
-| Architecture | SimpleCNN — 3 conv blocks (32→64→128), AdaptiveAvgPool2d(2,2), FC 512→256→10 |
+| Architecture | SimpleCNN 3 conv blocks (32→64→128), AdaptiveAvgPool2d(2,2), FC 512→256→10 |
 | Parameters | 227,018 (MNIST, 1 channel) · 227,594 (CIFAR-10, 3 channels) |
 | Optimiser | Adam, lr=1e-3, weight_decay=1e-4 |
 | Scheduler | ReduceLROnPlateau(mode='min', factor=0.5, patience=3), steps on **training** loss |
-| Loss | CrossEntropyLoss (no explicit softmax in the model — the loss applies it) |
+| Loss | CrossEntropyLoss (no explicit softmax in the model the loss applies it) |
 | Dropout | 0.5 |
 | Seeds | [42, 123, 456, 789, 1011] |
 | Subset sizes | 0.2%, 0.5%, 1%, 2%, 5% |
 | Epochs | MNIST 20 · CIFAR-10 30 |
 | Batch size | 128 (`min(BATCH_SIZE, len(subset))` for very small subsets) |
 | Workers | 2, with `seed_worker` |
-| MNIST normalisation | mean 0.1307, std 0.3081 — no augmentation |
+| MNIST normalisation | mean 0.1307, std 0.3081 no augmentation |
 | CIFAR-10 normalisation | mean (0.4914, 0.4822, 0.4465), std (0.2023, 0.1994, 0.2010) |
-| CIFAR-10 augmentation | RandomHorizontalFlip + RandomCrop(32, padding=4) — **train split only** |
+| CIFAR-10 augmentation | RandomHorizontalFlip + RandomCrop(32, padding=4) **train split only** |
 
 ---
